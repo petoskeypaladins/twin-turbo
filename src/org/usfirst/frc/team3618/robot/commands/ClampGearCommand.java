@@ -12,11 +12,12 @@ public class ClampGearCommand extends Command {
     public ClampGearCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+    	requires(Robot.gearLiftSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.gearSubsystem.toggleClamp();
+		Robot.gearLiftSubsystem.toggleClamp();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -35,5 +36,6 @@ public class ClampGearCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	end();
     }
 }

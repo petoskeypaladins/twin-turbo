@@ -1,21 +1,21 @@
 
 package org.usfirst.frc.team3618.robot;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.opencv.core.Core;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.usfirst.frc.team3618.robot.subsystems.AgitatorSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.BallIntakeSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.GearLiftSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.ShooterSubsystem;
+import org.usfirst.frc.team3618.robot.vision.Pipeline;
+import org.usfirst.frc.team3618.sensorlib.ADIS16448_IMU;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -24,7 +24,10 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.VisionThread;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -37,11 +40,19 @@ public class Robot extends IterativeRobot {
 
 	public static OI oi;
 	public static final DriveSubsystem driveSubsystem = new DriveSubsystem();
-	public static final GearLiftSubsystem gearSubsystem = new GearLiftSubsystem();
+	public static final GearLiftSubsystem gearLiftSubsystem = new GearLiftSubsystem();
+	public static final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+	public static final BallIntakeSubsystem ballIntakeSubsystem = new BallIntakeSubsystem();
+	public static final AgitatorSubsystem agitatorSubsystem = new AgitatorSubsystem();
 
     Command autonomousCommand;
+    private ADIS16448_IMU gyro;
     
-
+    VisionThread visionThread;
+	private final Object imgLock = new Object();
+	private static final int IMG_WIDTH = 320;
+	private static final int IMG_HEIGHT = 240; 
+	public static double dCx;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -49,59 +60,45 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
 		oi = new OI();
-		new Thread(() -> {
-            UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-            camera.setResolution(640, 480);
-            camera.setExposureManual(1);
-            
-            
-            CvSink cvSink = CameraServer.getInstance().getVideo();
-            CvSource thresholdStream = CameraServer.getInstance().putVideo("Threshold", 640, 480);
-            CvSource contoursStream = CameraServer.getInstance().putVideo("contours", 640, 480);
-            
-            int iLowH = 50;
-        	int iHighH = 160;
-
-        	int iLowS = 100;
-        	int iHighS = 255;
-
-        	int iLowV = 30;
-        	int iHighV = 255;
-            
-            Mat source = new Mat();
-            Mat imgHSV = new Mat();
-            Mat imgThresholded = new Mat();
-            Mat hierarchy = new Mat();
-            
-            while(!Thread.interrupted()) {
-                cvSink.grabFrame(source);
-                Imgproc.cvtColor(source, imgHSV, Imgproc.COLOR_BGR2HSV);
-                Core.inRange(imgHSV, new Scalar(iLowH, iLowS, iLowV),
-                		new Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-                thresholdStream.putFrame(imgThresholded);
-                List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-				Imgproc.findContours(imgThresholded, contours, hierarchy, 0, 2, new Point(0, 0));
-				if (contours.size() > 2) {
-					Collections.sort(contours, new Comparator<MatOfPoint>() {
+//        chooser.addObject("My Auto", new MyAutoCommand());
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		camera.setExposureManual(100);
+        CvSink cvSink = CameraServer.getInstance().getVideo();
+        CvSource blobStream = CameraServer.getInstance().putVideo("blobPoints", 640, 480); 
+        CvSource thresholdStream = CameraServer.getInstance().putVideo("Threshold", 640, 480);
+	    final int IMG_CENTER = IMG_WIDTH / 2;
+		final Object imgLock = new Object();
+	    
+	    visionThread = new VisionThread(camera, new Pipeline(), pipeline -> {
+	    	Mat blobPoints = new Mat();
+	    	Mat thresholdImg = new Mat();
+	    	synchronized (imgLock) {
+				List<KeyPoint> blobs = pipeline.findBlobsOutput().toList();
+				System.out.println("Blobs: " + blobs.size());
+				cvSink.grabFrame(blobPoints);
+				for (KeyPoint blob : blobs) {
+					Imgproc.drawMarker(blobPoints, blob.pt, new Scalar(255,0,0));
+				}
+				blobStream.putFrame(blobPoints);
+				thresholdImg = pipeline.hsvThresholdOutput();
+				thresholdStream.putFrame(thresholdImg);
+				if (blobs.size() > 1) {
+					Collections.sort(blobs, new Comparator<KeyPoint>() {
 						@Override
-						public int compare(MatOfPoint arg0, MatOfPoint arg1) {
+						public int compare(KeyPoint arg0, KeyPoint arg1) {
 							// TODO Auto-generated method stub
-							double area0 = Imgproc.contourArea(arg0);
-							double area1 = Imgproc.contourArea(arg1);
-							return (area0 > area1) ? -1 : (area0 < area1) ? 1 : 0;
+							return (arg0.size > arg1.size) ? -1 : (arg0.size < arg1.size) ? 1 : 0;
 						}
 					});
-
-					contours = contours.subList(0, 2);
-					
-
-					
-					Imgproc.drawContours(source, contours, -1, new Scalar(255,0,0));
+					dCx = ((blobs.get(0).pt.x + blobs.get(1).pt.x)/2) - IMG_CENTER;
+					System.out.println(dCx);
 				}
-				contoursStream.putFrame(source);
-
-            }
-        }).start();
+	    	}
+	    });
+	    visionThread.start();
+		gyro = new ADIS16448_IMU();
+		gyro.calibrate();
     }
 	
 	/**
@@ -138,6 +135,7 @@ public class Robot extends IterativeRobot {
 			break;
 		} */
     	
+    	
     	// schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start();
     }
@@ -169,5 +167,9 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    public void robotPeriodic() {
+    	SmartDashboard.putNumber("Robot Angle", gyro.getAngleZ());
     }
 }

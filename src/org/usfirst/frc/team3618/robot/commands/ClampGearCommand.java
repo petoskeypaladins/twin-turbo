@@ -3,6 +3,7 @@ package org.usfirst.frc.team3618.robot.commands;
 import org.usfirst.frc.team3618.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  *
@@ -12,7 +13,7 @@ public class ClampGearCommand extends Command {
     public ClampGearCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.gearLiftSubsystem);
+    	requires((Subsystem) Robot.gearLiftSubsystem);
     }
 
     // Called just before this Command runs the first time

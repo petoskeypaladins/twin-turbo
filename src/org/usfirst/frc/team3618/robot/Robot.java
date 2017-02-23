@@ -9,10 +9,20 @@ import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.usfirst.frc.team3618.robot.commands.autonomous.GearAutonomous;
 import org.usfirst.frc.team3618.robot.subsystems.AgitatorSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.BallIntakeSubsystem;
-import org.usfirst.frc.team3618.robot.subsystems.DriveSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.CompetitionDriveSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.GearLiftSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.IndexableShooterSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.PracticeDriveSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.PracticeGearLiftSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.PracticeShooterSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.RopeClimbSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.ShiftingDriveSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.CompetitionGearLiftSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.CompetitionShooterSubsystem;
+import org.usfirst.frc.team3618.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.ShooterSubsystem;
 import org.usfirst.frc.team3618.robot.vision.Pipeline;
 import org.usfirst.frc.team3618.sensorlib.ADIS16448_IMU;
@@ -38,21 +48,34 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
  */
 public class Robot extends IterativeRobot {
 
+	public static final boolean isCompetitionBot = true; //ALSO CHANGE ROBOTMAP
 	public static OI oi;
-	public static final DriveSubsystem driveSubsystem = new DriveSubsystem();
-	public static final GearLiftSubsystem gearLiftSubsystem = new GearLiftSubsystem();
-	public static final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+	public static final ShiftingDriveSubsystem driveSubsystem = isCompetitionBot ?
+			(ShiftingDriveSubsystem) new CompetitionDriveSubsystem() :
+			(ShiftingDriveSubsystem) new PracticeDriveSubsystem();
+	public static GearLiftSubsystem gearLiftSubsystem;
+	public static IndexableShooterSubsystem shooterSubsystem;
 	public static final BallIntakeSubsystem ballIntakeSubsystem = new BallIntakeSubsystem();
 	public static final AgitatorSubsystem agitatorSubsystem = new AgitatorSubsystem();
+	public static final RopeClimbSubsystem ropeClimbSubsystem = new RopeClimbSubsystem();
 
     Command autonomousCommand;
-    private ADIS16448_IMU gyro;
+    private static ADIS16448_IMU gyro;
     
     VisionThread visionThread;
 	private final Object imgLock = new Object();
 	private static final int IMG_WIDTH = 320;
 	private static final int IMG_HEIGHT = 240; 
 	public static double dCx;
+	
+	public Robot() {
+		gearLiftSubsystem = isCompetitionBot ? 
+			new CompetitionGearLiftSubsystem() :
+			new PracticeGearLiftSubsystem();
+		shooterSubsystem = isCompetitionBot ?
+				new CompetitionShooterSubsystem() :
+				new PracticeShooterSubsystem();
+	}
 
     /**
      * This function is run when the robot is first started up and should be
@@ -75,7 +98,7 @@ public class Robot extends IterativeRobot {
 	    	Mat thresholdImg = new Mat();
 	    	synchronized (imgLock) {
 				List<KeyPoint> blobs = pipeline.findBlobsOutput().toList();
-				System.out.println("Blobs: " + blobs.size());
+//				System.out.println("Blobs: " + blobs.size());
 				cvSink.grabFrame(blobPoints);
 				for (KeyPoint blob : blobs) {
 					Imgproc.drawMarker(blobPoints, blob.pt, new Scalar(255,0,0));
@@ -92,7 +115,7 @@ public class Robot extends IterativeRobot {
 						}
 					});
 					dCx = ((blobs.get(0).pt.x + blobs.get(1).pt.x)/2) - IMG_CENTER;
-					System.out.println(dCx);
+//					System.out.println(dCx);
 				}
 	    	}
 	    });
@@ -124,17 +147,7 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
-		/* String autoSelected = SmartDashboard.getString("Auto Selector", "Default");
-		switch(autoSelected) {
-		case "My Auto":
-			autonomousCommand = new MyAutoCommand();
-			break;
-		case "Default Auto":
-		default:
-			autonomousCommand = new ExampleCommand();
-			break;
-		} */
-    	
+    	autonomousCommand = new GearAutonomous(0);
     	
     	// schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start();
@@ -160,6 +173,7 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        ((ShooterSubsystem) shooterSubsystem).printPosition();
     }
     
     /**
@@ -170,6 +184,10 @@ public class Robot extends IterativeRobot {
     }
     
     public void robotPeriodic() {
-    	SmartDashboard.putNumber("Robot Angle", gyro.getAngleZ());
+    	SmartDashboard.putNumber("Robot Angle", getRobotAngle());
+    }
+    
+    public static double getRobotAngle() {
+    	return gyro.getAngleZ();
     }
 }

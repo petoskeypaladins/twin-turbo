@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3618.robot.commands;
 
 import org.usfirst.frc.team3618.robot.Robot;
+import org.usfirst.frc.team3618.robot.subsystems.ShooterSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -20,7 +21,7 @@ public class EjectBallCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.shooterSubsystem.setPower(-1);
+    	((ShooterSubsystem) Robot.shooterSubsystem).setPower(-1);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -30,7 +31,7 @@ public class EjectBallCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.shooterSubsystem.setPower(0);
+//    	((ShooterSubsystem) Robot.shooterSubsystem).setPower(0);
     }
 
     // Called when another command which requires one or more of the same

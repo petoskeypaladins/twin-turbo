@@ -15,17 +15,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveSubsystem extends Subsystem {
     
-	private RobotDrive robotDrive;
-	private final CANTalon frontLeftMotor = new CANTalon(RobotMap.FRONT_LEFT_DRIVE);
-	private final CANTalon rearLeftMotor = new CANTalon(RobotMap.REAR_LEFT_DRIVE);
-	private final CANTalon frontRightMotor = new CANTalon(RobotMap.FRONT_RIGHT_DRIVE);
-	private final CANTalon rearRightMotor = new CANTalon(RobotMap.REAR_RIGHT_DRIVE);
+	protected RobotDrive robotDrive;
+	protected final CANTalon frontLeftMotor = new CANTalon(RobotMap.FRONT_LEFT_DRIVE);
+	protected final CANTalon rearLeftMotor = new CANTalon(RobotMap.REAR_LEFT_DRIVE);
+	protected final CANTalon frontRightMotor = new CANTalon(RobotMap.FRONT_RIGHT_DRIVE);
+	protected final CANTalon rearRightMotor = new CANTalon(RobotMap.REAR_RIGHT_DRIVE);
 	
-	private final Solenoid shiftSolenoid = new Solenoid(RobotMap.SHIFT_SOLENOID);
 	
 	public DriveSubsystem() {
-		frontLeftMotor.setInverted(true);
-		rearLeftMotor.setInverted(true);
 		robotDrive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
 		robotDrive.setSafetyEnabled(false);
 	}
@@ -50,20 +47,12 @@ public class DriveSubsystem extends Subsystem {
     	SmartDashboard.putNumber("Right Value", rightValue);
     }
     
+    public void driveStraight(double speed) {
+    	robotDrive.tankDrive(speed, speed);
+    }
+    
     public void stopMe() {
     	robotDrive.tankDrive(0, 0);
-    }
-    
-    public void shift() {
-    	shiftSolenoid.set(!shiftSolenoid.get());
-    }
-    
-    public boolean getShiftSolenoidState() {
-    	return shiftSolenoid.get();
-    }
-    
-    public void setShiftSolenoid(boolean on) {
-    	shiftSolenoid.set(on);
     }
 }
 

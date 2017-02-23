@@ -3,6 +3,7 @@ package org.usfirst.frc.team3618.robot.commands;
 import org.usfirst.frc.team3618.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  *
@@ -15,7 +16,7 @@ public class LiftGearCommand extends Command {
     public LiftGearCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.gearLiftSubsystem);
+    	requires((Subsystem) Robot.gearLiftSubsystem);
     }
 
     // Called just before this Command runs the first time
@@ -39,6 +40,7 @@ public class LiftGearCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.gearLiftSubsystem.setClampPiston(initialClampPistonState);
     	System.out.println("end lift gear");
     }
 

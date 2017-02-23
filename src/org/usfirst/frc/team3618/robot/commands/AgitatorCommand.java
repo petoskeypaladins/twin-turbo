@@ -27,6 +27,8 @@ public class AgitatorCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	final double AGITATOR_SPEED = 1;
+    	double speed = direction * AGITATOR_SPEED;
     	Robot.agitatorSubsystem.setSpeed(direction);
     }
 

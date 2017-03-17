@@ -4,6 +4,7 @@ import org.usfirst.frc.team3618.robot.RobotMap;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
@@ -14,7 +15,7 @@ public class BallIntakeSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private CANTalon ballIntakeMotor = new CANTalon(RobotMap.BALL_INTAKE_MOTOR);
+	private Spark ballIntakeMotor = new Spark(RobotMap.BALL_INTAKE_MOTOR);
 
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
@@ -22,7 +23,7 @@ public class BallIntakeSubsystem extends Subsystem {
     }
     
     public BallIntakeSubsystem() {
-    	ballIntakeMotor.setInverted(true);
+//    	ballIntakeMotor.setInverted(true);
     }
     
     public void setSpeed(double speed) {
@@ -30,7 +31,7 @@ public class BallIntakeSubsystem extends Subsystem {
     }
     
     public void setDirection(int direction) {
-    	setSpeed(direction);
+    	setSpeed(-direction);
     }
     
 }

@@ -32,27 +32,38 @@ public class PlaceGearCommand extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
 		Robot.driveSubsystem.setShiftSolenoid(true);
+		Robot.resetRobotAngle();
 		currentGearStep = GearStep.kHorizontalAlign;
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-		double magnitude = .35;
+		double speed = .4;
 		double direction = 0;
 		final double rotation = 0;
 		switch (currentGearStep) {
 		case kHorizontalAlign:
 			double dCx = Robot.dCx;
 			dCx = (Math.abs(dCx) < 5) ? 0 : dCx;
-			if (dCx < 0) {
-				direction = -90;
-			} else if (dCx > 0) {
-				direction = 90;
+			if (dCx != 0) {
+				double proportional = 200;
+				final double MAX_SPEED = .6;
+				final double MIN_SPEED = .30;
+				try {
+					direction = dCx / Math.abs(dCx);
+					speed = -((dCx / proportional) + direction * MIN_SPEED);
+					speed = Math.abs(speed) > MAX_SPEED ? direction * MAX_SPEED : speed;
+				} catch (Exception e) {
+					e.printStackTrace();
+					currentGearStep = GearStep.kForwardMove;
+				}
 			} else {
 				currentGearStep = GearStep.kForwardMove;
-				magnitude = 0;
+				speed = 0;
+				System.out.println("FINISHED HORIZONTAL ALIGN");
 			}
-			((DriveSubsystem) Robot.driveSubsystem).driveMecanum(magnitude, direction, rotation);
+			((DriveSubsystem) Robot.driveSubsystem).strafe(speed);
+			System.out.printf("dCx: %-20s Speed: %-20s\n", dCx, speed);
 			break;
 		case kForwardMove:
 			Timer forwardTimer = new Timer();
@@ -60,9 +71,11 @@ public class PlaceGearCommand extends Command {
 			final double forwardDriveTime = 1;
 			if (forwardTimer.get() >= forwardDriveTime) {
 				currentGearStep = GearStep.kUnclamp;
-				magnitude = 0;
+				System.out.println("STOPPED FORWARD");
+				speed = 0;
 			}
-			((DriveSubsystem) Robot.driveSubsystem).driveMecanum(magnitude, direction, rotation);
+			System.out.println("time: " + forwardTimer.get());
+			((DriveSubsystem) Robot.driveSubsystem).driveMecanum(speed, direction, rotation);
 		case kUnclamp:
 			Robot.gearLiftSubsystem.setClampPiston(true);
 			currentGearStep = GearStep.kBackwardMove;
@@ -74,6 +87,7 @@ public class PlaceGearCommand extends Command {
 			if (backwardTimer.get() >= backwardDriveTime){
 				finished = true;
 			}
+			break;
 		default:
 			break;
 		}

@@ -24,22 +24,29 @@ public class RotateCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	Robot.driveSubsystem.setShiftSolenoid(true);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	final double MAX_ERROR = 5;
+    	final double MAX_ERROR = 1;
     	double currentAngle = Robot.getRobotAngle();
-    	double error = targetAngle - currentAngle;
+    	double error = currentAngle - targetAngle ;
+    	double proportional = 20;
+    	final double MAX_SPEED = .6;
+    	final double MIN_SPEED = .40;
 		try {
-			int direction = (int) (error / Math.abs(error));
-			final double SPEED = .25;
-			((DriveSubsystem) Robot.driveSubsystem).driveTank(direction * SPEED, -direction * SPEED);
+    		double direction = error / Math.abs(error);
+    		double speed = (error / proportional) + direction * MIN_SPEED;
+    		speed = Math.abs(speed) > MAX_SPEED ? direction * MAX_SPEED : speed;
+//    		speed = Math.abs(speed) < MIN_SPEED ? direction * MIN_SPEED : speed;
+			((DriveSubsystem) Robot.driveSubsystem).driveArcade(0, speed);
+			System.out.printf("currentAngle: %-20s targetAngle: %-20s speed: %-20s\n", currentAngle, targetAngle, speed);
 		} catch (Exception e) {
 			e.printStackTrace();
 			finished = true;
 		}
-		finished = error < MAX_ERROR;
+		finished = Math.abs(error) < MAX_ERROR;
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -48,7 +48,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
  */
 public class Robot extends IterativeRobot {
 
-	public static final boolean isCompetitionBot = true; //ALSO CHANGE ROBOTMAP
+	public static final boolean isCompetitionBot = true;
 	public static OI oi;
 	public static final ShiftingDriveSubsystem driveSubsystem = isCompetitionBot ?
 			(ShiftingDriveSubsystem) new CompetitionDriveSubsystem() :
@@ -106,6 +106,13 @@ public class Robot extends IterativeRobot {
 				blobStream.putFrame(blobPoints);
 				thresholdImg = pipeline.hsvThresholdOutput();
 				thresholdStream.putFrame(thresholdImg);
+				double MIN_BLOB_AREA = 15;
+//				for (int i = 0; i < blobs.size(); i++) {
+//					if (blobs.get(i).size < MIN_BLOB_AREA) {
+//						System.out.println("removed blob: " + i + " of size " + blobs.get(i).size);
+//						blobs.remove(i);
+//					}
+//				}
 				if (blobs.size() > 1) {
 					Collections.sort(blobs, new Comparator<KeyPoint>() {
 						@Override
@@ -114,8 +121,8 @@ public class Robot extends IterativeRobot {
 							return (arg0.size > arg1.size) ? -1 : (arg0.size < arg1.size) ? 1 : 0;
 						}
 					});
+					System.out.println("target Area: " + blobs.get(0).size);
 					dCx = ((blobs.get(0).pt.x + blobs.get(1).pt.x)/2) - IMG_CENTER;
-//					System.out.println(dCx);
 				}
 	    	}
 	    });
@@ -147,10 +154,16 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
-    	autonomousCommand = new GearAutonomous(0);
-    	
-    	// schedule the autonomous command (example)
-        if (autonomousCommand != null) autonomousCommand.start();
+    	boolean SIT_AND_CRY = false;
+    	if (!SIT_AND_CRY) {
+    		int liftNumber = 0;
+    		autonomousCommand = new GearAutonomous(liftNumber);
+
+    		// schedule the autonomous command (example)
+    		if (autonomousCommand != null) {
+    			autonomousCommand.start();
+    		}
+    	}
     }
 
     /**
@@ -185,9 +198,15 @@ public class Robot extends IterativeRobot {
     
     public void robotPeriodic() {
     	SmartDashboard.putNumber("Robot Angle", getRobotAngle());
+    	SmartDashboard.putNumber("Distance", ((DriveSubsystem) driveSubsystem).getDistance());
+    	SmartDashboard.putNumber("dCx", dCx);
     }
     
     public static double getRobotAngle() {
     	return gyro.getAngleZ();
+    }
+    
+    public static void resetRobotAngle() {
+    	gyro.reset();
     }
 }

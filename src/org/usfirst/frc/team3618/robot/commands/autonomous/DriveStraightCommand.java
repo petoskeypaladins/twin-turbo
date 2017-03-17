@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.command.Command;
 public class DriveStraightCommand extends Command {
 	
 	private double distance;
-	private Timer timer = new Timer();
 
     public DriveStraightCommand(double distance) {
         // Use requires() here to declare subsystem dependencies
@@ -22,19 +21,22 @@ public class DriveStraightCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	timer.start();
+    	((DriveSubsystem) Robot.driveSubsystem).resetEncoder();
+    	Robot.resetRobotAngle();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	final double SPEED = .4;
-    	((DriveSubsystem) Robot.driveSubsystem).driveStraight(SPEED);
+    	((DriveSubsystem) Robot.driveSubsystem).driveDistance(distance, this.timeSinceInitialized());
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	double currentDistance = timeToDistance(timer.get());
-        return currentDistance >= distance;
+    	final double MAX_ERR = 1;
+    	double currentDistance = ((DriveSubsystem) Robot.driveSubsystem).getDistance();
+    	double error = distance - currentDistance;
+    	System.out.printf("error: %-20s distance: %-20s\n", error, currentDistance);
+        return Math.abs(error) <= MAX_ERR;
     }
 
     // Called once after isFinished returns true
@@ -45,12 +47,7 @@ public class DriveStraightCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	System.out.println("TIMER INTERRUPT");
     	end();
-    }
-    
-    private double timeToDistance(double time) {
-    	final double RATIO = 1;
-    	double distance = time * RATIO;
-    	return distance;
     }
 }

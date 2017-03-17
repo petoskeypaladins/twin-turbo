@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RopeClimbCommand extends Command {
 	
-	public static final int UP = 1;
-	public static final int DOWN = -1;
+	public static final int UP = -1;
+	public static final int DOWN = 1;
 	private int direction;
 
     public RopeClimbCommand(int direction) {

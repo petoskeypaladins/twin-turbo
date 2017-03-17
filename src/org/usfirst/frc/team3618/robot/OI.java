@@ -33,8 +33,8 @@ public class OI {
 	private Button agitatorForwardButton = new JoystickButton(operatorJoystick, 11);
 	private Button agitatorBackwardButton = new JoystickButton(operatorJoystick, 12);
 	private Button ejectBallButton = new JoystickButton(operatorJoystick, 7);
-	private Button climbUpButton = new JoystickButton(operatorJoystick, 6);
-	private Button climbDownButton = new JoystickButton(operatorJoystick, 5);
+	private Button climbUpButton = new JoystickButton(operatorJoystick, 5);
+	private Button climbDownButton = new JoystickButton(operatorJoystick, 6);
 
 
 	private Button shiftButton = new JoystickButton(driveController, 6);

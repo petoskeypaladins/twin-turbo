@@ -32,7 +32,7 @@ public class CompetitionShooterSubsystem extends ShooterSubsystem
     	shootMotor.setP(0);
     	shootMotor.setI(0);
     	shootMotor.setD(0);
-		shootMotor.changeControlMode(TalonControlMode.Speed);
+//		shootMotor.changeControlMode(TalonControlMode.Speed);
     }
 
     public void toggleBallIndexSolenoid() {

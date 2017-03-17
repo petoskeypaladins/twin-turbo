@@ -25,6 +25,15 @@ public class DriveCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	double x = OI.driveController.getRawAxis(0);
+    	if (OI.driveController.getRawButton(6)) {
+    		Robot.driveSubsystem.setShiftSolenoid(false);
+    	} else if (OI.driveController.getRawButton(5)) {
+    		Robot.driveSubsystem.setShiftSolenoid(true);
+    	} else {
+    		Robot.driveSubsystem.setShiftSolenoid(Math.abs(x) >= 0.2);
+    	}
+//    	Robot.driveSubsystem.setShiftSolenoid(true);
     	boolean isMecanum = Robot.driveSubsystem.getShiftSolenoidState();
     	if (isMecanum) {
 			double magnitude = getMagnitude();
@@ -34,14 +43,20 @@ public class DriveCommand extends Command {
 			rotation = Math.pow(rotation, 3);
 			
 			((DriveSubsystem) Robot.driveSubsystem).driveMecanum(magnitude, direction, rotation);
+//			((DriveSubsystem) Robot.driveSubsystem).strafe(OI.operatorJoystick.getRawAxis(0));
     	} else {
-    		double leftValue = -OI.driveController.getY(Hand.kLeft);
-    		double rightValue = OI.driveController.getY(Hand.kRight);
+    		double rotateValue = -OI.driveController.getX(Hand.kRight);
+    		double moveValue = -OI.driveController.getY(Hand.kLeft);
+//    		double leftValue = -OI.driveController.getY(Hand.kLeft);
+//    		double rightValue = OI.driveController.getY(Hand.kRight);
     		
-    		leftValue = Math.abs(leftValue) < .15 ? 0 : leftValue;
-    		rightValue = Math.abs(rightValue) < .15 ? 0 : rightValue;
+//    		leftValue = Math.abs(leftValue) < .15 ? 0 : leftValue;
+//    		rightValue = Math.abs(rightValue) < .15 ? 0 : rightValue;
+    		moveValue = Math.abs(moveValue) < .15 ? 0 : moveValue;
+    		rotateValue = Math.abs(rotateValue) < .15 ? 0 : rotateValue;
     		
-    		((DriveSubsystem) Robot.driveSubsystem).driveTank(leftValue, rightValue);
+//    		((DriveSubsystem) Robot.driveSubsystem).driveTank(leftValue, rightValue);
+    		((DriveSubsystem) Robot.driveSubsystem).driveArcade(moveValue, rotateValue);
     	}
     }
 

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3618.robot.subsystems;
 
+import org.usfirst.frc.team3618.robot.Robot;
 import org.usfirst.frc.team3618.robot.RobotMap;
 import org.usfirst.frc.team3618.robot.commands.HoodAngleCommand;
 
@@ -20,15 +21,20 @@ public abstract class ShooterSubsystem extends Subsystem {
 
 	private final CANTalon hoodAngleMotor = new CANTalon(RobotMap.HOOD_ANGLE_MOTOR);
 	protected final CANTalon shootMotor = new CANTalon(RobotMap.SHOOT_MOTOR);
+	private final CANTalon secondaryShootMotor = new CANTalon(RobotMap.SECONDARY_SHOOT_MOTOR);
 	
 	private final double HOOD_MAX = 1141;
 	private final double HOOD_MIN = 1392;
 	
 	private final AnalogInput hoodAnglePotentiometer = new AnalogInput(RobotMap.HOOD_ANGLE_POTENTIOMETER);
-	private final DigitalInput photoSensor = new DigitalInput(RobotMap.BALL_INDEX_PHOTOSENSOR);
+//	private final DigitalInput photoSensor = new DigitalInput(RobotMap.BALL_INDEX_PHOTOSENSOR);
 	
 	public ShooterSubsystem() {
-		
+		secondaryShootMotor.changeControlMode(TalonControlMode.Follower);
+		secondaryShootMotor.set(shootMotor.getDeviceID());
+		if (Robot.isCompetitionBot) {
+			shootMotor.setInverted(true);
+		}
 	}
 
     public void initDefaultCommand() {
@@ -43,10 +49,12 @@ public abstract class ShooterSubsystem extends Subsystem {
     }
     
     public void setHoodAngleSpeed(double speed) {
-    	if (hoodAnglePotentiometer.getValue() < HOOD_MAX && speed < 0 ) {
-    		speed = 0;
-    	} else if (hoodAnglePotentiometer.getValue() > HOOD_MIN && speed > 0) {
-    		speed = 0;
+    	if (Robot.isCompetitionBot) {
+    		if (hoodAnglePotentiometer.getValue() < HOOD_MAX && speed < 0 ) {
+    			speed = 1773;
+    		} else if (hoodAnglePotentiometer.getValue() > HOOD_MIN && speed > 0) {
+    			speed = 2040;
+    		}
     	}
     	hoodAngleMotor.set(speed);
     	SmartDashboard.putNumber("Hood Potentiometer", hoodAnglePotentiometer.getValue());
@@ -66,6 +74,7 @@ public abstract class ShooterSubsystem extends Subsystem {
 		SmartDashboard.putNumber("Shooter Output: ", motorOutput);
 		SmartDashboard.putNumber("Shooter Speed: ", shootMotor.getSpeed());
 		
+		shootMotor.changeControlMode(TalonControlMode.Speed);
 		shootMotor.set(rpm/10);
 		
 		SmartDashboard.putNumber("Shooter Error", shootMotor.getClosedLoopError());
@@ -81,15 +90,15 @@ public abstract class ShooterSubsystem extends Subsystem {
     }
     
     public void setPower(double speed) {
-    		shootMotor.changeControlMode(TalonControlMode.PercentVbus);
-    		shootMotor.set(speed);
-    		SmartDashboard.putNumber("ShooterSpeed", speed);
-    		SmartDashboard.putNumber("ShooterRpm", shootMotor.getSpeed());
+    	shootMotor.changeControlMode(TalonControlMode.PercentVbus);
+    	shootMotor.set(speed);
+    	SmartDashboard.putNumber("ShooterSpeed", speed);
+    	SmartDashboard.putNumber("ShooterRpm", shootMotor.getSpeed());
     }
     
-    public boolean getPhotoSensor() {
-    	return photoSensor.get();
-    }
+//    public boolean getPhotoSensor() {
+//    	return photoSensor.get();
+//    }
 
 }
 

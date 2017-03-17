@@ -1,35 +1,29 @@
-package org.usfirst.frc.team3618.robot.commands;
+package org.usfirst.frc.team3618.robot.commands.autonomous;
 
-import org.usfirst.frc.team3618.robot.OI;
 import org.usfirst.frc.team3618.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  *
  */
-public class AgitatorCommand extends Command {
+public class DropGearCommand extends Command {
+	
 
-    public static final int FORWARD = -1;
-    public static final int BACKWARD = 1;
-    private int direction;
-
-	public AgitatorCommand(int direction) {
+    public DropGearCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.agitatorSubsystem);
-    	this.direction = direction;
+    	requires((Subsystem) Robot.driveSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	Robot.gearLiftSubsystem.setClampPiston(false);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	final double AGITATOR_SPEED = .25;
-    	double speed = direction * AGITATOR_SPEED;
-    	Robot.agitatorSubsystem.setSpeed(direction);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -39,12 +33,10 @@ public class AgitatorCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.agitatorSubsystem.setSpeed(0);
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	end();
     }
 }

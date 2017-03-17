@@ -6,25 +6,31 @@ package org.usfirst.frc.team3618.robot;
  * floating around.
  */
 public class RobotMap {
-		private boolean isCompetitionBot = true;
-		public static final int FRONT_LEFT_DRIVE = 2;
-		public static final int REAR_LEFT_DRIVE = 3;
-		public static final int FRONT_RIGHT_DRIVE = 4;
-		public static final int REAR_RIGHT_DRIVE = 5;
+		public static int FRONT_LEFT_DRIVE = 2;
+		public static int REAR_LEFT_DRIVE = 3;
+		public static int FRONT_RIGHT_DRIVE = 4;
+		public static int REAR_RIGHT_DRIVE = 5;
 		
-		public static final int HOOD_ANGLE_MOTOR = 8;
-		public static final int SHOOT_MOTOR = 10;
-		public static final int BALL_INTAKE_MOTOR = 9;
-		public static final int AGITATOR_MOTOR = 6;
-		public static final int CLIMB_MOTOR = 7;
+		public static int HOOD_ANGLE_MOTOR = 8;
+		public static int SHOOT_MOTOR = 10;
+		public static int SECONDARY_SHOOT_MOTOR = 9;
+		public static int BALL_INTAKE_MOTOR = 0;
+		public static int AGITATOR_MOTOR = 6;
+		public static int CLIMB_MOTOR = 7;
+	
+		public static int HOOD_ANGLE_POTENTIOMETER = 3;
+		public static int BALL_INDEX_PHOTOSENSOR = 0;
 		
-		public static final int HOOD_ANGLE_POTENTIOMETER = 3;
-		public static final int BALL_INDEX_PHOTOSENSOR = 0;
-		
-		public static final int GEAR_CLAMP_PISTON = 2;
-		public static final int GEAR_LIFT_PISTON = 0;
-		public static final int SHIFT_SOLENOID = 6;
-		public static final int BALL_INDEX_PISTON = 4;
+		//COMPETITION
+		public static int GEAR_CLAMP_PISTON = 2;
+		public static int GEAR_LIFT_PISTON = 0;
+		public static int SHIFT_SOLENOID = 6;
+		public static int BALL_INDEX_PISTON = 4;
+		//PRACTICE
+//		public static int GEAR_CLAMP_PISTON = 2;
+//		public static int GEAR_LIFT_PISTON = 0;
+//		public static int SHIFT_SOLENOID = 1;
+//		public static int BALL_INDEX_PISTON = 3;
 
 		public RobotMap() {
 //			if (isCompetitionBot) {

@@ -48,7 +48,7 @@ public class CompetitionGearLiftSubsystem extends Subsystem
     public void setClampPiston(boolean on) {
     	DoubleSolenoid.Value clampValue = on ?
     			DoubleSolenoid.Value.kForward :
-				DoubleSolenoid.Value.kForward;
+				DoubleSolenoid.Value.kReverse;
         clampPiston.set(clampValue);
         SmartDashboard.putString("Clamp Position", clampPiston.get().toString());
     }

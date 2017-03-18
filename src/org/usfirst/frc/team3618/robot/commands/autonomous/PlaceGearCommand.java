@@ -21,6 +21,8 @@ public class PlaceGearCommand extends Command {
 
 	GearStep currentGearStep;
 	boolean finished;
+	Timer forwardTimer = new Timer();
+	Timer backwardTimer = new Timer();
 	
     public PlaceGearCommand() {
         // Use requires() here to declare subsystem dependencies
@@ -48,7 +50,7 @@ public class PlaceGearCommand extends Command {
 			if (dCx != 0) {
 				double proportional = 200;
 				final double MAX_SPEED = .6;
-				final double MIN_SPEED = .30;
+				final double MIN_SPEED = .32;
 				try {
 					direction = dCx / Math.abs(dCx);
 					speed = -((dCx / proportional) + direction * MIN_SPEED);
@@ -59,6 +61,7 @@ public class PlaceGearCommand extends Command {
 				}
 			} else {
 				currentGearStep = GearStep.kForwardMove;
+				forwardTimer.start();
 				speed = 0;
 				System.out.println("FINISHED HORIZONTAL ALIGN");
 			}
@@ -66,8 +69,6 @@ public class PlaceGearCommand extends Command {
 			System.out.printf("dCx: %-20s Speed: %-20s\n", dCx, speed);
 			break;
 		case kForwardMove:
-			Timer forwardTimer = new Timer();
-			forwardTimer.start();
 			final double forwardDriveTime = 1;
 			if (forwardTimer.get() >= forwardDriveTime) {
 				currentGearStep = GearStep.kUnclamp;
@@ -79,10 +80,9 @@ public class PlaceGearCommand extends Command {
 		case kUnclamp:
 			Robot.gearLiftSubsystem.setClampPiston(true);
 			currentGearStep = GearStep.kBackwardMove;
+			backwardTimer.start();
 			break;
 		case kBackwardMove:
-			Timer backwardTimer = new Timer();
-			backwardTimer.start();
 			final double backwardDriveTime = 1;
 			if (backwardTimer.get() >= backwardDriveTime){
 				finished = true;

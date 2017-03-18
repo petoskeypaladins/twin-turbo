@@ -1,34 +1,29 @@
-package org.usfirst.frc.team3618.robot.commands;
-
-import org.usfirst.frc.team3618.robot.Robot;
+package org.usfirst.frc.team3618.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  *
  */
-public class ClampGearCommand extends Command {
+public class Wait extends Command {
 
-    public ClampGearCommand() {
+    public Wait() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires((Subsystem) Robot.gearLiftSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-		Robot.gearLiftSubsystem.toggleClamp();
-		System.out.println("TOGGLING CLAMP");
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	System.out.println("WAITING");
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return true;
+        return false;
     }
 
     // Called once after isFinished returns true

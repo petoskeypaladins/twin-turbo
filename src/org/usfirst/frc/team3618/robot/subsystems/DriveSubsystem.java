@@ -25,6 +25,7 @@ public class DriveSubsystem extends Subsystem {
 	protected final CANTalon frontRightMotor = new CANTalon(RobotMap.FRONT_RIGHT_DRIVE);
 	protected final CANTalon rearRightMotor = new CANTalon(RobotMap.REAR_RIGHT_DRIVE);
 	
+	boolean finishedCurve = false;
 	
 	public DriveSubsystem() {
 		robotDrive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
@@ -90,6 +91,31 @@ public class DriveSubsystem extends Subsystem {
     	}
     	SmartDashboard.putNumber("speed", speed);
     	System.out.printf("Target Counts: %-20s Current Counts: %-20s Speed: %-20s\n", targetCounts, currentCounts, speed);
+    }
+    
+    
+    public void driveCurve(double radius) {
+    	double arcLength = (Math.PI /3) * radius;
+    	double targetCounts = inchesToCounts(arcLength);
+    	double currentCounts = frontLeftMotor.getEncPosition();
+    	double proportional = 6000;
+    	double speed = (targetCounts - currentCounts) / proportional;
+    	final double MAX_SPEED = .6;
+    	final double MIN_SPEED = .325;
+    	try {
+    		double direction = speed / Math.abs(speed);
+    		speed = Math.abs(speed) > MAX_SPEED ? direction * MAX_SPEED : speed;
+    		speed = Math.abs(speed) < MIN_SPEED ? direction * MIN_SPEED : speed;
+    		driveStraightGyro(speed);
+    	} catch (Exception e) {
+    		
+    	}
+    	SmartDashboard.putNumber("speed", speed);
+    	System.out.printf("Target Counts: %-20s Current Counts: %-20s Speed: %-20s\n", targetCounts, currentCounts, speed);
+    }
+    
+    public boolean getFinishedCurve() {
+    	return finishedCurve;
     }
     
     public double getDistance() {

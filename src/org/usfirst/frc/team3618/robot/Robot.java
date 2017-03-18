@@ -9,6 +9,7 @@ import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.usfirst.frc.team3618.robot.commands.autonomous.BaselineAutonomous;
 import org.usfirst.frc.team3618.robot.commands.autonomous.GearAutonomous;
 import org.usfirst.frc.team3618.robot.subsystems.AgitatorSubsystem;
 import org.usfirst.frc.team3618.robot.subsystems.BallIntakeSubsystem;
@@ -121,7 +122,7 @@ public class Robot extends IterativeRobot {
 							return (arg0.size > arg1.size) ? -1 : (arg0.size < arg1.size) ? 1 : 0;
 						}
 					});
-					System.out.println("target Area: " + blobs.get(0).size);
+//					System.out.println("target Area: " + blobs.get(0).size);
 					dCx = ((blobs.get(0).pt.x + blobs.get(1).pt.x)/2) - IMG_CENTER;
 				}
 	    	}
@@ -156,8 +157,13 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
     	boolean SIT_AND_CRY = false;
     	if (!SIT_AND_CRY) {
-    		int liftNumber = 0;
-    		autonomousCommand = new GearAutonomous(liftNumber);
+    		boolean GEAR = false;
+    		if (GEAR) {
+    			int liftNumber = 1;
+    			autonomousCommand = new GearAutonomous(liftNumber);
+    		} else {
+    			autonomousCommand = new BaselineAutonomous();
+    		}
 
     		// schedule the autonomous command (example)
     		if (autonomousCommand != null) {

@@ -23,8 +23,8 @@ public abstract class ShooterSubsystem extends Subsystem {
 	protected final CANTalon shootMotor = new CANTalon(RobotMap.SHOOT_MOTOR);
 	private final CANTalon secondaryShootMotor = new CANTalon(RobotMap.SECONDARY_SHOOT_MOTOR);
 	
-	private final double HOOD_MAX = 1141;
-	private final double HOOD_MIN = 1392;
+	private final double HOOD_MAX = 1804;
+	private final double HOOD_MIN = 2100;
 	
 	private final AnalogInput hoodAnglePotentiometer = new AnalogInput(RobotMap.HOOD_ANGLE_POTENTIOMETER);
 //	private final DigitalInput photoSensor = new DigitalInput(RobotMap.BALL_INDEX_PHOTOSENSOR);
@@ -51,9 +51,9 @@ public abstract class ShooterSubsystem extends Subsystem {
     public void setHoodAngleSpeed(double speed) {
     	if (Robot.isCompetitionBot) {
     		if (hoodAnglePotentiometer.getValue() < HOOD_MAX && speed < 0 ) {
-    			speed = 1773;
+    			speed = 0;
     		} else if (hoodAnglePotentiometer.getValue() > HOOD_MIN && speed > 0) {
-    			speed = 2040;
+    			speed = 0;
     		}
     	}
     	hoodAngleMotor.set(speed);

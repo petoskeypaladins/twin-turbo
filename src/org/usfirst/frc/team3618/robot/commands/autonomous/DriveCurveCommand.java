@@ -1,6 +1,7 @@
-package org.usfirst.frc.team3618.robot.commands;
+package org.usfirst.frc.team3618.robot.commands.autonomous;
 
 import org.usfirst.frc.team3618.robot.Robot;
+import org.usfirst.frc.team3618.robot.subsystems.DriveSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -8,27 +9,30 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  *
  */
-public class ClampGearCommand extends Command {
+public class DriveCurveCommand extends Command {
+	
+	private double radius;
 
-    public ClampGearCommand() {
+    public DriveCurveCommand(double radius) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires((Subsystem) Robot.gearLiftSubsystem);
+    	requires((Subsystem) Robot.driveSubsystem);
+    	this.radius = radius;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-		Robot.gearLiftSubsystem.toggleClamp();
-		System.out.println("TOGGLING CLAMP");
+    	((DriveSubsystem) Robot.driveSubsystem).resetEncoder();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	((DriveSubsystem) Robot.driveSubsystem).driveCurve(radius);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return true;
+        return false;
     }
 
     // Called once after isFinished returns true
@@ -38,6 +42,5 @@ public class ClampGearCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	end();
     }
 }

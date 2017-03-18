@@ -85,16 +85,18 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
 		oi = new OI();
 //        chooser.addObject("My Auto", new MyAutoCommand());
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-		camera.setExposureManual(100);
+		UsbCamera visionCamera = CameraServer.getInstance().startAutomaticCapture(0);
+		UsbCamera gearLiftCamera = CameraServer.getInstance().startAutomaticCapture(1);
+	    visionCamera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+	    gearLiftCamera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		visionCamera.setExposureManual(100);
         CvSink cvSink = CameraServer.getInstance().getVideo();
         CvSource blobStream = CameraServer.getInstance().putVideo("blobPoints", 640, 480); 
         CvSource thresholdStream = CameraServer.getInstance().putVideo("Threshold", 640, 480);
 	    final int IMG_CENTER = IMG_WIDTH / 2;
 		final Object imgLock = new Object();
 	    
-	    visionThread = new VisionThread(camera, new Pipeline(), pipeline -> {
+	    visionThread = new VisionThread(visionCamera, new Pipeline(), pipeline -> {
 	    	Mat blobPoints = new Mat();
 	    	Mat thresholdImg = new Mat();
 	    	synchronized (imgLock) {
@@ -107,7 +109,7 @@ public class Robot extends IterativeRobot {
 				blobStream.putFrame(blobPoints);
 				thresholdImg = pipeline.hsvThresholdOutput();
 				thresholdStream.putFrame(thresholdImg);
-				double MIN_BLOB_AREA = 15;
+//				double MIN_BLOB_AREA = 15;
 //				for (int i = 0; i < blobs.size(); i++) {
 //					if (blobs.get(i).size < MIN_BLOB_AREA) {
 //						System.out.println("removed blob: " + i + " of size " + blobs.get(i).size);
@@ -157,7 +159,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
     	boolean SIT_AND_CRY = false;
     	if (!SIT_AND_CRY) {
-    		boolean GEAR = false;
+    		boolean GEAR = true;
     		if (GEAR) {
     			int liftNumber = 1;
     			autonomousCommand = new GearAutonomous(liftNumber);

@@ -46,17 +46,18 @@ public class PlaceGearCommand extends Command {
 		switch (currentGearStep) {
 		case kHorizontalAlign:
 			double dCx = Robot.dCx;
-			dCx = (Math.abs(dCx) < 5) ? 0 : dCx;
+			dCx = (Math.abs(dCx) < 10) ? 0 : dCx;
 			if (dCx != 0) {
-				double proportional = 200;
+				double proportional = 260;
 				final double MAX_SPEED = .6;
-				final double MIN_SPEED = .32;
+				final double MIN_SPEED = .36;
 				try {
 					direction = dCx / Math.abs(dCx);
 					speed = -((dCx / proportional) + direction * MIN_SPEED);
 					speed = Math.abs(speed) > MAX_SPEED ? direction * MAX_SPEED : speed;
 				} catch (Exception e) {
 					e.printStackTrace();
+					forwardTimer.start();
 					currentGearStep = GearStep.kForwardMove;
 				}
 			} else {
@@ -75,8 +76,9 @@ public class PlaceGearCommand extends Command {
 				System.out.println("STOPPED FORWARD");
 				speed = 0;
 			}
-			System.out.println("time: " + forwardTimer.get());
-			((DriveSubsystem) Robot.driveSubsystem).driveMecanum(speed, direction, rotation);
+			System.out.println("forward time: " + forwardTimer.get());
+			((DriveSubsystem) Robot.driveSubsystem).driveStraightGyro(.6);;
+			break;
 		case kUnclamp:
 			Robot.gearLiftSubsystem.setClampPiston(true);
 			currentGearStep = GearStep.kBackwardMove;
@@ -86,7 +88,11 @@ public class PlaceGearCommand extends Command {
 			final double backwardDriveTime = 1;
 			if (backwardTimer.get() >= backwardDriveTime){
 				finished = true;
+				System.out.println("STOPPED FORWARD");
+				speed = 0;
 			}
+//			System.out.println("backward time: " + forwardTimer.get());
+			((DriveSubsystem) Robot.driveSubsystem).driveStraightGyro(-.6);
 			break;
 		default:
 			break;

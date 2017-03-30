@@ -49,7 +49,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
  */
 public class Robot extends IterativeRobot {
 
-	public static final boolean isCompetitionBot = true;
+	public static final boolean isCompetitionBot = false;
 	public static OI oi;
 	public static final ShiftingDriveSubsystem driveSubsystem = isCompetitionBot ?
 			(ShiftingDriveSubsystem) new CompetitionDriveSubsystem() :
@@ -159,7 +159,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
     	boolean SIT_AND_CRY = false;
     	if (!SIT_AND_CRY) {
-    		boolean GEAR = true;
+    		boolean GEAR = false;
     		if (GEAR) {
     			int liftNumber = 1;
     			autonomousCommand = new GearAutonomous(liftNumber);
@@ -207,6 +207,7 @@ public class Robot extends IterativeRobot {
     public void robotPeriodic() {
     	SmartDashboard.putNumber("Robot Angle", getRobotAngle());
     	SmartDashboard.putNumber("Distance", ((DriveSubsystem) driveSubsystem).getDistance());
+    	SmartDashboard.putNumber("Drive Counts", ((DriveSubsystem) driveSubsystem).getCounts());
     	SmartDashboard.putNumber("dCx", dCx);
     }
     

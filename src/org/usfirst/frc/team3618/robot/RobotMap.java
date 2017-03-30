@@ -22,15 +22,15 @@ public class RobotMap {
 		public static int BALL_INDEX_PHOTOSENSOR = 0;
 		
 		//COMPETITION
-		public static int GEAR_CLAMP_PISTON = 2;
-		public static int GEAR_LIFT_PISTON = 0;
-		public static int SHIFT_SOLENOID = 6;
-		public static int BALL_INDEX_PISTON = 4;
-		//PRACTICE
 //		public static int GEAR_CLAMP_PISTON = 2;
 //		public static int GEAR_LIFT_PISTON = 0;
-//		public static int SHIFT_SOLENOID = 1;
-//		public static int BALL_INDEX_PISTON = 3;
+//		public static int SHIFT_SOLENOID = 6;
+//		public static int BALL_INDEX_PISTON = 4;
+		//PRACTICE
+		public static int GEAR_CLAMP_PISTON = 2;
+		public static int GEAR_LIFT_PISTON = 0;
+		public static int SHIFT_SOLENOID = 1;
+		public static int BALL_INDEX_PISTON = 3;
 
 		public RobotMap() {
 //			if (isCompetitionBot) {

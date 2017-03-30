@@ -72,7 +72,12 @@ public class DriveSubsystem extends Subsystem {
     public void driveDistance(double distance, double time) {
 //    	frontRightMotor.set(targetCounts);
     	double targetCounts = inchesToCounts(distance);
-    	double currentCounts = frontLeftMotor.getEncPosition();
+    	double currentCounts;
+    	if (Robot.isCompetitionBot) {
+    		currentCounts = frontLeftMotor.getEncPosition();
+    	} else {
+    		currentCounts = -frontRightMotor.getEncPosition();
+    	}
     	double proportional = 6000;
     	double speed = (targetCounts - currentCounts) / proportional;
     	final double MAX_SPEED = .6;
@@ -97,7 +102,12 @@ public class DriveSubsystem extends Subsystem {
     public void driveCurve(double radius) {
     	double arcLength = (Math.PI /3) * radius;
     	double targetCounts = inchesToCounts(arcLength);
-    	double currentCounts = frontLeftMotor.getEncPosition();
+    	double currentCounts;
+    	if (Robot.isCompetitionBot) {
+    		currentCounts = frontLeftMotor.getEncPosition();
+    	} else {
+    		currentCounts = -frontRightMotor.getEncPosition();
+    	}
     	double proportional = 6000;
     	double speed = (targetCounts - currentCounts) / proportional;
     	final double MAX_SPEED = .6;
@@ -119,20 +129,36 @@ public class DriveSubsystem extends Subsystem {
     }
     
     public double getDistance() {
-    	return countsToInches(frontLeftMotor.getEncPosition());
+    	if (Robot.isCompetitionBot) {
+    		return countsToInches(frontLeftMotor.getEncPosition());
+    	} else {
+    		return countsToInches(-frontRightMotor.getEncPosition());
+    	}
+    }
+    
+    public double getCounts() {
+    	if (Robot.isCompetitionBot) {
+    		return frontLeftMotor.getEncPosition();
+    	} else {
+    		return -frontRightMotor.getEncPosition();
+    	}
     }
     
     public void resetEncoder() {
-    	frontLeftMotor.setEncPosition(0);
+    	if (Robot.isCompetitionBot) {
+    		frontLeftMotor.setEncPosition(0);
+    	} else {
+    		frontRightMotor.setEncPosition(0);
+    	}
     }
     
     public int inchesToCounts(double inches) {
-    	final double CPI = 356.4705882353;
+    	final double CPI = 351.1717861;
     	return (int) (inches * CPI);
     }
     
     public double countsToInches(double counts) {
-    	final double CPI = 356.4705882353;
+    	final double CPI = 351.1717861;
     	return (counts / CPI);
     }
     

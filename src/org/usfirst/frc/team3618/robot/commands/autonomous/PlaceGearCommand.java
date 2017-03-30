@@ -23,6 +23,7 @@ public class PlaceGearCommand extends Command {
 	boolean finished;
 	Timer forwardTimer = new Timer();
 	Timer backwardTimer = new Timer();
+	Timer unclampWaitTimer = new Timer();
 	
     public PlaceGearCommand() {
         // Use requires() here to declare subsystem dependencies
@@ -73,6 +74,7 @@ public class PlaceGearCommand extends Command {
 			final double forwardDriveTime = 1;
 			if (forwardTimer.get() >= forwardDriveTime) {
 				currentGearStep = GearStep.kUnclamp;
+				unclampWaitTimer.start();
 				System.out.println("STOPPED FORWARD");
 				speed = 0;
 			}
@@ -80,6 +82,12 @@ public class PlaceGearCommand extends Command {
 			((DriveSubsystem) Robot.driveSubsystem).driveStraightGyro(.6);;
 			break;
 		case kUnclamp:
+			final double unclampWaitTime = .5;
+			if (unclampWaitTimer.get() >= unclampWaitTime){
+				finished = true;
+				System.out.println("STOPPED FORWARD");
+				speed = 0;
+			}
 			Robot.gearLiftSubsystem.setClampPiston(true);
 			currentGearStep = GearStep.kBackwardMove;
 			backwardTimer.start();
